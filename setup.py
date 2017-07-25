@@ -6,5 +6,5 @@ setup(name='aws_utils',
       author_email='arnold_j@lanl.gov',
       version='0.1',
       packages=['aws_utils'],
-      install_requires=['boto3', 'ujson']
+      install_requires=['boto3', 'ujson'],
       license='MIT')

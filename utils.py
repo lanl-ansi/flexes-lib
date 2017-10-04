@@ -12,12 +12,18 @@ def get_credentials():
     if not None in credentials:
         return credentials
     else:
-        return load_config()
+        try:
+            return load_config()
+        except FileNotFoundError:
+            return None, None
 
 
-def load_config():
+def load_config(config_file='~/.lanlytics/credentials'):
     config = ConfigParser()
-    config.read('~/.lanlytics/credentials')
+    if os.path.isfile(config_file):
+        config.read(config_file)
+    else:
+        raise FileNotFoundError('{} not found'.format(config_file))
     
     default = config['default']
     api_key = default.get('api_key')

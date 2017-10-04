@@ -24,7 +24,7 @@ class Job:
     def check_status(self):
         if self.job_id is not None:
             response = requests.get('{}/jobs/{}'.format(self.url, self.job_id), 
-                                    self.headers=headers).json()
+                                    headers=self.headers).json()
             return response['status']
         else:
             raise ValueError('Job ID is None, has the job been submitted?')
@@ -32,7 +32,7 @@ class Job:
     def result(self):
         if self.job_id is not None:
             response = requests.get('{}/jobs/{}'.format(self.url, self.job_id), 
-                                    self.headers=headers).json()
+                                    headers=self.headers).json()
             return response 
         else:
             raise ValueError('Job ID is None, has the job been submitted?')
@@ -40,8 +40,7 @@ class Job:
     @staticmethod
     def ensure_ssl(url):
         parsed = urlparse(url)
-        parsed._replace(scheme='https')
-        return parsed.geturl()
+        return parsed.geturl().replace(parsed.scheme, 'https', 1)
 
     @staticmethod
     def create_headers(payload):

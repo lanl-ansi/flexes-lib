@@ -46,4 +46,4 @@ class TestUtils:
         api_key, hashed_payload = utils.sign_request_payload(payload)
         assert(api_key == os.environ.get('LANLYTICS_API_KEY'))
         assert(hashed_payload == hmac.new(os.environ.get('LANLYTICS_API_SECRET_KEY').encode(),
-                                          payload.encode(), hashlib.sha256).digest())
+                                          payload.encode(), hashlib.sha256).hexdigest())

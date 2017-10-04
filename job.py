@@ -1,32 +1,45 @@
 import requests
 import time
+from utils import sign_request_payload
 
 class Job:
     def __init__(self, url, body):
         self.url = url
         self.body = body
         self.job_id = None
+        self.headers = None
 
     def submit(self):
-        response = requests.post(self.url, json=self.body).json()
+        headers = self.create_headers(json.dumps(self.body))
+        response = requests.post(self.url, json=self.body, headers=headers).json()
         if response['status'] == 'submitted':
             self.job_id = response['job_id']
+            self.headers = self.create_headers(self.job_id) 
             return self.job_id
         else:
             raise ValueError('Error submitting job: {}'.format(response['message']))
 
     def check_status(self):
         if self.job_id is not None:
-            response = requests.get('{}/jobs/{}'.format(self.url, self.job_id)).json()
+            response = requests.get('{}/jobs/{}'.format(self.url, self.job_id), 
+                                    self.headers=headers).json()
             return response['status']
         else:
             raise ValueError('Job ID is None, has the job been submitted?')
 
     def result(self):
         if self.job_id is not None:
-            return requests.get('{}/jobs/{}'.format(self.url, self.job_id)).json()
+            response = requests.get('{}/jobs/{}'.format(self.url, self.job_id), 
+                                    self.headers=headers).json()
+            return response 
         else:
             raise ValueError('Job ID is None, has the job been submitted?')
+
+    @staticmethod
+    def create_headers(payload):
+        api_key, signature = sign_request_payload(payload)
+        headers = {'Authorization': api_key, 'Signature': signature}
+        return headers
 
 
 def run_task(url, body):

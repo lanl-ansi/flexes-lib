@@ -1,10 +1,12 @@
+import json
 import requests
 import time
+from urllib.parse import urlparse
 from utils import sign_request_payload
 
 class Job:
     def __init__(self, url, body):
-        self.url = url
+        self.url = self.ensure_ssl(url)
         self.body = body
         self.job_id = None
         self.headers = None
@@ -34,6 +36,12 @@ class Job:
             return response 
         else:
             raise ValueError('Job ID is None, has the job been submitted?')
+
+    @staticmethod
+    def ensure_ssl(url):
+        parsed = urlparse(url)
+        parsed._replace(scheme='https')
+        return parsed.geturl()
 
     @staticmethod
     def create_headers(payload):

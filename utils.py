@@ -38,6 +38,6 @@ def sign_request_payload(payload):
     api_key = credentials[0]
     api_secret_key = credentials[1]
 
-    hashed_payload = hmac.new(api_secret_key, msg=payload, hashlib.sha256).digest()
+    hashed_payload = hmac.new(api_secret_key.encode(), payload.encode(), hashlib.sha256).digest()
 
     return api_key, hashed_payload

@@ -49,14 +49,14 @@ class Job:
         return headers
 
 
-def run_task(url, body):
+def run_task(url, body, poll_frequency=1):
     job = Job(url, body)
     job_id = job.submit()
     job_status = job.check_status()
 
     while job_status in ['submitted', 'running']:
         job_status = job.check_status()
-        time.sleep(1)
+        time.sleep(poll_frequency)
     result = job.result()
 
     if job_status in ['complete', 'active']:

@@ -15,16 +15,19 @@ def parse_s3_uri(uri, s3=None):
     return s3.Bucket(bucket_name), key
 
 
-def download_from_s3(uri, local_file, s3=None):
+def download_from_s3(uri, local_dir='', s3=None):
     if s3 is None:
         s3 = boto3.resource('s3')
+    
+    files = [obj for obj in list_files_s3(uri, s3=s3)]
+
+    if len(files) == 0:
+        raise FileNotFoundError('File {} not found'.format(uri))
+
     bucket, prefix = parse_s3_uri(uri, s3)
-    for obj in list_files_s3(uri, s3=s3):
-        bucket_name, key = split_s3_uri(obj)
-        local_file = os.path.join(os.path.dirname(local_file), 
-                                  os.path.basename(key))
-        if not key.endswith('/'):
-            bucket.download_file(key, local_file)
+    for obj in files:
+        local_file = os.path.join(local_dir, os.path.basename(obj))
+        bucket.download_file(obj, local_file)
 
 
 def upload_to_s3(local_file, uri, s3=None):

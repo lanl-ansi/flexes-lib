@@ -42,6 +42,12 @@ class TestS3Utils:
         s3.download_from_s3(self.uri, self.local_file)
 
     @mock.patch('boto3.resource')
+    @mock.patch('aws_utils.s3_utils.list_files_s3', return_value=[])
+    def test_download_from_s3_not_found(self, mock_list, mock_resource):
+        with pytest.raises(FileNotFoundError):
+            s3.download_from_s3(self.uri, self.local_file)
+
+    @mock.patch('boto3.resource')
     @mock.patch('os.listdir', return_value=['file.txt'])
     def test_upload_to_s3(self, mock_list_dir, mock_resource):
         s3.upload_to_s3(self.local_file, self.uri)

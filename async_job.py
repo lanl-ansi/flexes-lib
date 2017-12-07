@@ -21,7 +21,7 @@ class AsyncJob:
         else:
             raise ValueError('Error submitting job: {}'.format(response['message']))
 
-    def check_status(self):
+    async def check_status(self):
         if self.job_id is not None:
             response = await get_request('{}/jobs/{}'.format(self.url, self.job_id), 
                                          headers=self.headers)
@@ -29,7 +29,7 @@ class AsyncJob:
         else:
             raise ValueError('Job ID is None, has the job been submitted?')
 
-    def result(self):
+    async def result(self):
         if self.job_id is not None:
             response = await get_request('{}/jobs/{}'.format(self.url, self.job_id), 
                                          headers=self.headers)

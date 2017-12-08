@@ -1,6 +1,7 @@
 import aiohttp
 import json
 import time
+from urllib.parse import urlparse
 from utils import sign_request_payload
 
 class AsyncJob:
@@ -51,14 +52,14 @@ class AsyncJob:
 
 async def get_request(url):
     async with aiohttp.ClientSession() as session:
-        async with session.get(url) as resp:
-            return await resp.json()
+        async with session.get(url) as response:
+            return await response.json()
 
 
 async def post_request(url, body, headers=None):
     async with aiohttp.ClientSession() as session:
-        async with session.post(url, data=body, headers=headers) as resp:
-            return await resp.json()
+        async with session.post(url, data=body, headers=headers) as response:
+            return await response.json()
 
 
 async def run_task(url, body, poll_frequency=1):

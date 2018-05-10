@@ -1,6 +1,6 @@
 import os, pytest, sys
 
-sys.path.append('')
+sys.path.append('.')
 
 import mock
 import s3_utils as s3

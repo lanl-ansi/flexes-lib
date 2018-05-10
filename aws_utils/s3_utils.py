@@ -79,7 +79,7 @@ def list_files_s3(uri, suffix='', s3=None):
     while len(input_files) > 0:
         input_files = [obj.key
                         for obj in bucket.objects.filter(Prefix=prefix, Marker=input_files[-1])
-                        if obj.key.endswith(suffix)]
+                        if obj.key.endswith(suffix) and not obj.key.endswith('/')]
         for f in input_files:
             yield os.path.join('s3://{}'.format(bucket.name), f)
 

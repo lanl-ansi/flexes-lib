@@ -5,19 +5,19 @@ from urllib.parse import urlparse
 from utils import sign_request_payload
 
 class AsyncJob:
-    def __init__(self, url, body):
+    def __init__(self, url, body, sign=False):
         self.url = self.ensure_ssl(url)
         self.body = body
         self.job_id = None
         self.headers = None
+        self.sign = sign
 
     async def submit(self):
-        headers = self.create_headers(json.dumps(self.body))
-        headers['content-type'] = 'application/json'
+        headers = self.create_headers(json.dumps(self.body)) if self.sign is True else None
         response = await post_request(self.url, json=self.body, headers=headers)
         if response['status'] == 'submitted':
             self.job_id = response['job_id']
-            self.headers = self.create_headers(self.job_id) 
+            self.headers = self.create_headers(self.job_id) if self.sign is True else None
             return self.job_id
         else:
             raise ValueError('Error submitting job: {}'.format(response['message']))
@@ -50,15 +50,15 @@ class AsyncJob:
         return headers
 
 
-async def get_request(url):
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url) as response:
+async def get_request(url, headers=None):
+    async with aiohttp.ClientSession(trust_env=True) as session:
+        async with session.get(url, headers=headers) as response:
             return await response.json()
 
 
 async def post_request(url, body, headers=None):
-    async with aiohttp.ClientSession() as session:
-        async with session.post(url, data=body, headers=headers) as response:
+    async with aiohttp.ClientSession(trust_env=True) as session:
+        async with session.post(url, json=body, headers=headers) as response:
             return await response.json()
 
 

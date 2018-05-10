@@ -5,18 +5,23 @@ from urllib.parse import urlparse
 from utils import sign_request_payload
 
 class Job:
-    def __init__(self, url, body):
+    def __init__(self, url, body, sign=False):
         self.url = self.ensure_ssl(url)
         self.body = body
         self.job_id = None
         self.headers = None
+        self.sign = sign
 
     def submit(self):
-        headers = self.create_headers(json.dumps(self.body))
+        if self.sign is True:
+            headers = self.create_headers(json.dumps(self.body))
+        else:
+            headers = None
         response = requests.post(self.url, json=self.body, headers=headers).json()
         if response['status'] == 'submitted':
             self.job_id = response['job_id']
-            self.headers = self.create_headers(self.job_id) 
+            if self.sign is True:
+                self.headers = self.create_headers(self.job_id) 
             return self.job_id
         else:
             raise ValueError('Error submitting job: {}'.format(response['message']))

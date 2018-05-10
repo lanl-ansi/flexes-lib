@@ -3,7 +3,7 @@ import os, pytest, sys
 sys.path.append('')
 
 import mock
-from aws_utils import s3_utils as s3
+import s3_utils as s3
 from collections import namedtuple
 from io import BytesIO
 
@@ -37,12 +37,12 @@ class TestS3Utils:
         assert(key == 'path/to/folder/file.txt')
 
     @mock.patch('boto3.resource')
-    @mock.patch('aws_utils.s3_utils.list_files_s3', side_effect=mock_list_files)
+    @mock.patch('s3_utils.list_files_s3', side_effect=mock_list_files)
     def test_download_from_s3(self, mock_list, mock_resource):
         s3.download_from_s3(self.uri, self.local_file)
 
     @mock.patch('boto3.resource')
-    @mock.patch('aws_utils.s3_utils.list_files_s3', return_value=[])
+    @mock.patch('s3_utils.list_files_s3', return_value=[])
     def test_download_from_s3_not_found(self, mock_list, mock_resource):
         with pytest.raises(FileNotFoundError):
             s3.download_from_s3(self.uri, self.local_file)

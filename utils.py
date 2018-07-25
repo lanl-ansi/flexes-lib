@@ -4,9 +4,23 @@ import os
 from configparser import ConfigParser
 
 def has_credentials(credentials):
+    '''Check if user has API credentials configured in environment.
+
+    Args:
+        credentials (tuple): A tuple containing (api_key, api_secret_key)
+
+    Returns:
+        bool
+    '''
     return not None in credentials
 
 def get_credentials():
+    '''Retrieve user API credentials. Check environment variables first, then
+        a configuration file if environment variables aren't set.
+
+    Returns:
+        tuple: User credentials (api_key, api_secret_key)
+    '''
     api_key = os.environ.get('LANLYTICS_API_KEY')
     api_secret_key = os.environ.get('LANLYTICS_API_SECRET_KEY')
 
@@ -22,6 +36,14 @@ def get_credentials():
 
 
 def load_config(config_file='~/.lanlytics/credentials'):
+    '''Load user API credentials from file
+
+    Args:
+        config_file (str): Path to configuration file, default ~/.lanlytics/credentials
+
+    Returns:
+        tuple: User credentials (api_key, api_secret_key)
+    '''
     if '~' in config_file:
         config_file = os.path.expanduser(config_file)
 
@@ -42,6 +64,14 @@ def load_config(config_file='~/.lanlytics/credentials'):
 
 
 def sign_request_payload(payload):
+    '''Sign API request payload with user keys
+
+    Args:
+        payload (str): Request payload
+
+    Returns:
+        tuple: (api_key, hashed_payload)
+    '''
     credentials = get_credentials()
 
     if not has_credentials(credentials):

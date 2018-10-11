@@ -29,7 +29,7 @@ print(result['status'])
 # active
 ```
 
-The nice thing about asynchronous jobs is that you can run them in parallel.
+The nice thing about asynchronous tasks is that you can run them in parallel.
 This example submits three jobs in parallel and then waits for all three to
 complete before returning the results.
 ```python

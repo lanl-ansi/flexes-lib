@@ -8,6 +8,6 @@ cache: pip
 
 install: pip install .[dev]
 
-script: py.test --cov lanlytics_api_lib
+script: py.test --cov=lanlytics_api_lib
 
 after_success: bash <(curl -s https://cov.lanlytics.com/bash) -t "zvYVxfDUQ2Swtbv11JFS" -r nisac/lanlytics-api-lib

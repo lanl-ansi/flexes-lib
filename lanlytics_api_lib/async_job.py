@@ -1,11 +1,11 @@
+import aiohttp
 import json
-import requests
 import time
 from urllib.parse import urlparse
-from utils import sign_request_payload
+from .utils import sign_request_payload
 
-class Job:
-    '''Handler for API jobs
+class AsyncJob:
+    '''Asynchronous handler for API jobs
 
     Attributes:
         url (str): API endpoint
@@ -26,7 +26,7 @@ class Job:
         self.headers = None
         self.sign = sign
 
-    def submit(self):
+    async def submit(self):
         '''Submit job to API
         
         Returns:
@@ -35,20 +35,16 @@ class Job:
         Raises:
             ValueError: If submission fails
         '''
-        if self.sign is True:
-            headers = self.create_headers(json.dumps(self.body))
-        else:
-            headers = None
-        response = requests.post(self.url, json=self.body, headers=headers).json()
+        headers = self.create_headers(json.dumps(self.body)) if self.sign is True else None
+        response = await post_request(self.url, json=self.body, headers=headers)
         if response['status'] == 'submitted':
             self.job_id = response['job_id']
-            if self.sign is True:
-                self.headers = self.create_headers(self.job_id) 
+            self.headers = self.create_headers(self.job_id) if self.sign is True else None
             return self.job_id
         else:
             raise ValueError('Error submitting job: {}'.format(response['message']))
 
-    def check_status(self):
+    async def check_status(self):
         '''Check status of job
         
         Returns:
@@ -58,13 +54,13 @@ class Job:
             ValueError: If `job_id` is `None`
         '''
         if self.job_id is not None:
-            response = requests.get('{}/jobs/{}'.format(self.url, self.job_id), 
-                                    headers=self.headers).json()
+            response = await get_request('{}/jobs/{}'.format(self.url, self.job_id), 
+                                         headers=self.headers)
             return response['status']
         else:
             raise ValueError('Job ID is None, has the job been submitted?')
 
-    def result(self):
+    async def result(self):
         '''Get job result
         
         Returns:
@@ -74,8 +70,8 @@ class Job:
             ValueError: If `job_id` is `None`
         '''
         if self.job_id is not None:
-            response = requests.get('{}/jobs/{}'.format(self.url, self.job_id), 
-                                    headers=self.headers).json()
+            response = await get_request('{}/jobs/{}'.format(self.url, self.job_id), 
+                                         headers=self.headers)
             return response 
         else:
             raise ValueError('Job ID is None, has the job been submitted?')
@@ -108,13 +104,44 @@ class Job:
         return headers
 
 
-def run_task(url, body, poll_frequency=1):
+async def get_request(url, headers=None):
+    '''Execute GET request asynchronously
+
+    Args:
+        url (str): Request URL
+        headers (dict, optional): Authorization and Signature headers
+
+    Returns:
+        dict: JSON response
+    '''
+    async with aiohttp.ClientSession(trust_env=True) as session:
+        async with session.get(url, headers=headers) as response:
+            return await response.json()
+
+
+async def post_request(url, body, headers=None):
+    '''Execute POST request with JSON body asynchronously
+
+    Args:
+        url (str): Request URL
+        body (dict): JSON request body
+        headers (dict, optional): Authorization and Signature headers
+
+    Returns:
+        dict: JSON response
+    '''
+    async with aiohttp.ClientSession(trust_env=True) as session:
+        async with session.post(url, json=body, headers=headers) as response:
+            return await response.json()
+
+
+async def run_task(body, poll_frequency=1, url='https://api.lanlytics.com'):
     '''Submit and execute job through the API
 
     Args:
-        url (str): API endpoint
         body (dict): Message body
         poll_frequency (int, optional): Status poll frequency in seconds, default 1
+        url (str, optional): API endpoint, default https://api.lanlytics.com
 
     Returns:
         dict: Job result
@@ -122,14 +149,14 @@ def run_task(url, body, poll_frequency=1):
     Raises:
         ValueError: If job fails
     '''
-    job = Job(url, body)
-    job_id = job.submit()
-    job_status = job.check_status()
+    job = AsyncJob(url, body)
+    job_id = await job.submit()
+    job_status = await job.check_status()
 
     while job_status in ['submitted', 'running']:
-        job_status = job.check_status()
+        job_status = await job.check_status()
         time.sleep(poll_frequency)
-    result = job.result()
+    result = await job.result()
 
     if job_status in ['complete', 'active']:
         return result

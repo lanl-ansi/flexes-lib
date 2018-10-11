@@ -1,11 +1,11 @@
-import aiohttp
 import json
+import requests
 import time
 from urllib.parse import urlparse
-from utils import sign_request_payload
+from .utils import sign_request_payload
 
-class AsyncJob:
-    '''Asynchronous handler for API jobs
+class Job:
+    '''Handler for API jobs
 
     Attributes:
         url (str): API endpoint
@@ -26,7 +26,7 @@ class AsyncJob:
         self.headers = None
         self.sign = sign
 
-    async def submit(self):
+    def submit(self):
         '''Submit job to API
         
         Returns:
@@ -35,16 +35,20 @@ class AsyncJob:
         Raises:
             ValueError: If submission fails
         '''
-        headers = self.create_headers(json.dumps(self.body)) if self.sign is True else None
-        response = await post_request(self.url, json=self.body, headers=headers)
+        if self.sign is True:
+            headers = self.create_headers(json.dumps(self.body))
+        else:
+            headers = None
+        response = requests.post(self.url, json=self.body, headers=headers).json()
         if response['status'] == 'submitted':
             self.job_id = response['job_id']
-            self.headers = self.create_headers(self.job_id) if self.sign is True else None
+            if self.sign is True:
+                self.headers = self.create_headers(self.job_id) 
             return self.job_id
         else:
             raise ValueError('Error submitting job: {}'.format(response['message']))
 
-    async def check_status(self):
+    def check_status(self):
         '''Check status of job
         
         Returns:
@@ -54,13 +58,13 @@ class AsyncJob:
             ValueError: If `job_id` is `None`
         '''
         if self.job_id is not None:
-            response = await get_request('{}/jobs/{}'.format(self.url, self.job_id), 
-                                         headers=self.headers)
+            response = requests.get('{}/jobs/{}'.format(self.url, self.job_id), 
+                                    headers=self.headers).json()
             return response['status']
         else:
             raise ValueError('Job ID is None, has the job been submitted?')
 
-    async def result(self):
+    def result(self):
         '''Get job result
         
         Returns:
@@ -70,8 +74,8 @@ class AsyncJob:
             ValueError: If `job_id` is `None`
         '''
         if self.job_id is not None:
-            response = await get_request('{}/jobs/{}'.format(self.url, self.job_id), 
-                                         headers=self.headers)
+            response = requests.get('{}/jobs/{}'.format(self.url, self.job_id), 
+                                    headers=self.headers).json()
             return response 
         else:
             raise ValueError('Job ID is None, has the job been submitted?')
@@ -104,38 +108,7 @@ class AsyncJob:
         return headers
 
 
-async def get_request(url, headers=None):
-    '''Execute GET request asynchronously
-
-    Args:
-        url (str): Request URL
-        headers (dict, optional): Authorization and Signature headers
-
-    Returns:
-        dict: JSON response
-    '''
-    async with aiohttp.ClientSession(trust_env=True) as session:
-        async with session.get(url, headers=headers) as response:
-            return await response.json()
-
-
-async def post_request(url, body, headers=None):
-    '''Execute POST request with JSON body asynchronously
-
-    Args:
-        url (str): Request URL
-        body (dict): JSON request body
-        headers (dict, optional): Authorization and Signature headers
-
-    Returns:
-        dict: JSON response
-    '''
-    async with aiohttp.ClientSession(trust_env=True) as session:
-        async with session.post(url, json=body, headers=headers) as response:
-            return await response.json()
-
-
-async def run_task(url, body, poll_frequency=1):
+def run_task(url, body, poll_frequency=1):
     '''Submit and execute job through the API
 
     Args:
@@ -149,14 +122,14 @@ async def run_task(url, body, poll_frequency=1):
     Raises:
         ValueError: If job fails
     '''
-    job = AsyncJob(url, body)
-    job_id = await job.submit()
-    job_status = await job.check_status()
+    job = Job(url, body)
+    job_id = job.submit()
+    job_status = job.check_status()
 
     while job_status in ['submitted', 'running']:
-        job_status = await job.check_status()
+        job_status = job.check_status()
         time.sleep(poll_frequency)
-    result = await job.result()
+    result = job.result()
 
     if job_status in ['complete', 'active']:
         return result

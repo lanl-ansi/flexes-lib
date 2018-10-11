@@ -7,9 +7,9 @@ python:
   - "3.4"
 cache: pip
 
-install: pip install -r requirements.txt
+install: pip install -e .[dev]
 
-script: py.test --cov s3_utils
+script: py.test --cov aws_utils
 
 after_success:
   - bash <(curl -s https://cov.lanlytics.com/bash) -t "zvYVxfDUQ2Swtbv11JFS" -r nisac/aws-utils

@@ -104,7 +104,7 @@ class AsyncJob:
         return headers
 
 
-async def get_request(url, headers=None):
+async def get_request(url, headers=None): # pragma: no cover
     '''Execute GET request asynchronously
 
     Args:
@@ -119,7 +119,7 @@ async def get_request(url, headers=None):
             return await response.json()
 
 
-async def post_request(url, body, headers=None):
+async def post_request(url, body, headers=None): # pragma: no cover
     '''Execute POST request with JSON body asynchronously
 
     Args:

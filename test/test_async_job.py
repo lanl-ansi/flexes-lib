@@ -1,10 +1,9 @@
 import os, pytest, sys
 
-sys.path.append('.')
-import async_job
 import json
 from asyncio import get_event_loop
 from mock import MagicMock
+from lanlytics_api_lib import async_job
 
 os.environ['LANLYTICS_API_KEY'] = '123456testapikey'
 os.environ['LANLYTICS_API_SECRET_KEY'] = 'testapisecretkey123456'
@@ -21,21 +20,19 @@ def AsyncMock(*args, **kwargs):
 
     mock_coro.mock = m
     return mock_coro
-#    async def __call__(self, *args, **kwargs):
-#        return super(AsyncMock, self).__call__(*args, **kwargs)
 
 
 @pytest.fixture
 def mock_get(mocker):
     mock_get_request = AsyncMock()
-    mocker.patch('async_job.get_request', new=mock_get_request)
+    mocker.patch('lanlytics_api_lib.async_job.get_request', new=mock_get_request)
     return mock_get_request.mock
 
 
 @pytest.fixture
 def mock_post(mocker):
     mock_post_request = AsyncMock()
-    mocker.patch('async_job.post_request', new=mock_post_request)
+    mocker.patch('lanlytics_api_lib.async_job.post_request', new=mock_post_request)
     return mock_post_request.mock
 
 
@@ -54,15 +51,12 @@ class TestAsyncJob:
         assert(j.url == self.url)
         assert(j.body == self.body)
 
-#    @mock.patch('async_job.post_request', new_callable=AsyncMock)
     def test_Job_submit(self, mock_post):
         mock_post.return_value = {'status': 'submitted', 'job_id': 'test1234'}
         j = async_job.AsyncJob(self.url, self.body)
         job_id = _run(j.submit())
         assert(job_id == 'test1234')
 
-#    @mock.patch('async_job.post_request', new_callable=AsyncMock)
-#    @mock.patch('async_job.get_request', new_callable=AsyncMock)
     def test_job_check_status(self, mock_get, mock_post):
         mock_post.return_value = {'status': 'submitted', 'job_id': 'test1234'}
         mock_get.return_value = {'status': 'running', 'job_id': 'test1234'}
@@ -72,8 +66,6 @@ class TestAsyncJob:
         assert(status == 'running')
 
 
-#    @mock.patch('async_job.post_request', new_callable=AsyncMock)
-#    @mock.patch('async_job.get_request', new_callable=AsyncMock)
     def test_job_result(self, mock_get, mock_post):
         mock_post.return_value = {'status': 'submitted', 'job_id': 'test1234'}
         mock_get.return_value = {'status': 'complete', 'job_id': 'test1234', 'result': 'success'}
@@ -94,19 +86,15 @@ class TestAsyncJob:
         assert(headers_post is not None)
         assert(headers_get is not None)
 
-#    @mock.patch('async_job.post_request', new_callable=AsyncMock)
-#    @mock.patch('async_job.get_request', new_callable=AsyncMock)
     def test_run_task(self, mock_get, mock_post):
         mock_post.return_value = {'status': 'submitted', 'job_id': 'test1234'}
         mock_get.side_effect = [{'status': 'running', 'job_id': 'test1234'},
                                 {'status': 'running', 'job_id': 'test1234'},
                                 {'status': 'complete', 'job_id': 'test1234'},
                                 {'status': 'complete', 'job_id': 'test1234', 'result': 'success'}]
-        result = _run(async_job.run_task(self.url, self.body))
+        result = _run(async_job.run_task(self.body))
         assert(result['result'] == 'success')
 
-#    @mock.patch('async_job.post_request', new_callable=AsyncMock)
-#    @mock.patch('async_job.get_request', new_callable=AsyncMock)
     def test_run_task_fail(self, mock_get, mock_post):
         mock_post.return_value = {'status': 'submitted', 'job_id': 'test1234'}
         mock_get.side_effect = [{'status': 'running', 'job_id': 'test1234'},
@@ -114,4 +102,4 @@ class TestAsyncJob:
                                 {'status': 'failed', 'job_id': 'test1234'},
                                 {'status': 'failed', 'job_id': 'test1234', 'result': 'success'}]
         with pytest.raises(ValueError):
-            _run(async_job.run_task(self.url, self.body))
+            _run(async_job.run_task(self.body))

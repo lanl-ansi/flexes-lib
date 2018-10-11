@@ -1,10 +1,9 @@
 import os, pytest, sys
 
-sys.path.append('.')
 import hashlib
 import hmac
 import mock
-import utils
+from lanlytics_api_lib import utils
 
 class TestUtils:
     def setup_method(self, _):
@@ -16,7 +15,7 @@ class TestUtils:
         credentials = utils.get_credentials()
         assert(None not in credentials)
 
-    @mock.patch('utils.load_config', return_value=('key', 'secret'))
+    @mock.patch('lanlytics_api.lib.utils.load_config', return_value=('key', 'secret'))
     def test_get_credentials_config(self, mock_load_config):
         del os.environ['LANLYTICS_API_KEY']
         del os.environ['LANLYTICS_API_SECRET_KEY']
@@ -24,7 +23,7 @@ class TestUtils:
         assert(api_key == 'key')
         assert(api_secret_key == 'secret')
 
-    @mock.patch('utils.load_config', side_effect=FileNotFoundError('File not found'))
+    @mock.patch('lanlytics_api_lib.utils.load_config', side_effect=FileNotFoundError('File not found'))
     def test_get_credentials_config(self, mock_load_config):
         del os.environ['LANLYTICS_API_KEY']
         del os.environ['LANLYTICS_API_SECRET_KEY']

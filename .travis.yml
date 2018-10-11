@@ -6,7 +6,7 @@ python:
   
 cache: pip
 
-install: pip install .[dev]
+install: pip install -e .[dev]
 
 script: py.test --cov=lanlytics_api_lib
 

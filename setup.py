@@ -19,7 +19,7 @@ setuptools.setup(
         'dev': [
             'codecov',
             'mock',
-            'pytest',
+            'pytest>=3.6',
             'pytest-cov'
         ]    
     },

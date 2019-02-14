@@ -12,7 +12,7 @@ setuptools.setup(
     long_description_content_type='text/markdown',
     packages=setuptools.find_packages(),
     install_requires=[
-        'boto3>=1.7.17',
+        'boto3>=1.9.94',
         'ujson>=1.35'
     ],
     extras_require={

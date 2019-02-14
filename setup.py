@@ -4,10 +4,10 @@ with open('README.md') as f:
     long_description = f.read()
 
 setuptools.setup(
-    name='aws_utils',
+    name='lanlytics_cloud_utils',
     version='0.1.0',
     author='James Arnold',
-    description='Utilities for interacting with Amazon Web Services',
+    description='Utilities for interacting with cloud platforms',
     long_description=long_description,
     long_description_content_type='text/markdown',
     packages=setuptools.find_packages(),

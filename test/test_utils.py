@@ -3,7 +3,7 @@ import os, pytest, sys
 import hashlib
 import hmac
 import mock
-from lanlytics_api_lib import utils
+from flexes_lib import utils
 
 class TestUtils:
     def setup_method(self, _):
@@ -23,7 +23,7 @@ class TestUtils:
         assert(api_key == 'key')
         assert(api_secret_key == 'secret')
 
-    @mock.patch('lanlytics_api_lib.utils.load_config', side_effect=FileNotFoundError('File not found'))
+    @mock.patch('flexes_lib.utils.load_config', side_effect=FileNotFoundError('File not found'))
     def test_get_credentials_config(self, mock_load_config):
         del os.environ['LANLYTICS_API_KEY']
         del os.environ['LANLYTICS_API_SECRET_KEY']

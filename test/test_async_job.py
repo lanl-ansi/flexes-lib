@@ -3,7 +3,7 @@ import os, pytest, sys
 import json
 from asyncio import get_event_loop
 from mock import MagicMock
-from lanlytics_api_lib import async_job
+from flexes_lib import async_job
 
 os.environ['LANLYTICS_API_KEY'] = '123456testapikey'
 os.environ['LANLYTICS_API_SECRET_KEY'] = 'testapisecretkey123456'
@@ -25,14 +25,14 @@ def AsyncMock(*args, **kwargs):
 @pytest.fixture
 def mock_get(mocker):
     mock_get_request = AsyncMock()
-    mocker.patch('lanlytics_api_lib.async_job.get_request', new=mock_get_request)
+    mocker.patch('flexes_lib.async_job.get_request', new=mock_get_request)
     return mock_get_request.mock
 
 
 @pytest.fixture
 def mock_post(mocker):
     mock_post_request = AsyncMock()
-    mocker.patch('lanlytics_api_lib.async_job.post_request', new=mock_post_request)
+    mocker.patch('flexes_lib.async_job.post_request', new=mock_post_request)
     return mock_post_request.mock
 
 

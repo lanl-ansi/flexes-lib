@@ -2,7 +2,7 @@ import os, pytest, sys
 
 import mock
 import json
-from lanlytics_api_lib import job
+from flexes_lib import job
 
 os.environ['LANLYTICS_API_KEY'] = '123456testapikey'
 os.environ['LANLYTICS_API_SECRET_KEY'] = 'testapisecretkey123456'

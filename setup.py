@@ -12,16 +12,17 @@ setuptools.setup(
     long_description_content_type='text/markdown',
     packages=setuptools.find_packages(),
     install_requires=[
-        'boto3>=1.9.94',
-        'ujson>=1.35'
         'aiohttp>=3.2.1',
-        'requests>=2.18.4'
+        'boto3>=1.9.94',
+        'requests>=2.18.4',
+        'ujson>=1.35'
     ],
     extras_require={
         'dev': [
             'codecov',
             'mock',
             'pytest>=3.6',
+            'pytest-cov',
             'pytest-mock'
         ]    
     },

@@ -1,7 +1,7 @@
 import os, pytest, sys
 
 import mock
-from lanlytics_cloud_utils.aws import ec2_utils as ec2
+from flexes_lib.aws import ec2_utils as ec2
 
 class TestEC2Utils:
     @mock.patch('boto3.resource')

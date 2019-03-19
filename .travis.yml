@@ -5,4 +5,4 @@ python:
   - "3.5" 
 cache: pip
 install: pip install -e .[dev]
-script: py.test --cov lanlytics_cloud_utils --cov-lanlytics_api_lib
+script: py.test --cov flexes_lib

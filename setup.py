@@ -5,7 +5,7 @@ with open('README.md') as f:
 
 setuptools.setup(
     name='flexes_lib',
-    version='0.1.0',
+    version='0.1.1',
     author='James Arnold',
     description='Helper library for interacting with flexes',
     long_description=long_description,

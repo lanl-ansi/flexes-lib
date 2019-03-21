@@ -1,8 +1,17 @@
 language: python
 python:
-  - "3.7"
-  - "3.6"
-  - "3.5" 
+- '3.7'
+- '3.6'
+- '3.5'
 cache: pip
 install: pip install -e .[dev]
 script: py.test --cov flexes_lib
+deploy:
+  provider: pypi
+  user: arnoldj
+  password:
+    secure: RtBsbvORevBQwBCFyr1ugNpQ7TENjTf13MSFxYOq++B+ImEgncq93q0xNbXkFMEgH2tbvICgw86AXFmFY8DMvSskMuwf/c4Jn3jNseJoAriPpucJdicT4PrUBfjT9l7M7oxtDY+td4ODuiN+giuhIMiCYlTdXI5NSe/0rli3OCXQ5FtiNKW+CbqckrIV5ykwvWCX5w5bdKmn3S2c1zni/ACzCSDE1GC6BoHaAAhbQ3KPHUk/SkzqCCZiGg2JAYicNrgqY3caf7vaGxjaTfxmPWHMcywGlkr+lH3WIMuGCfCJtC7NvjKBgJXFY1OLuKmqHsM1/SMfRCQsCD3x8fOA0QJrvi7xQl5F+HZ/pNHNsEtKLGiE+77LWnhGgMnWzyOYiHxbDn0/ZNFutxj5b0PvwmmzHAaoSOJfyBDIQaBG+aduUW5qRIesMfHgbtWkdb8/LJlvuWhKpI4q5yYiXz6ktAZ7j/P4uqkVMaeDEKayqtzPFNDsNasy8yZ6LdBRU0H7D/g60LCy3P+fLrevXhD6Sjtcq7M6FOzjKpdwl3H3RfP/yjgX/3m4dx7CDHiJOUQdrjKDkfLnWuo8WPbjNPiXGcAmtieKAUGMs0rE90KrcBjKXBFaWnzxHbOI522aVQMZYKr2W5JwSoIB4JbhZpc68oG3DcEvreweDxfjle+DVXY=
+  on:
+    branch: master
+    condition: $TRAVIS_PYTHON_VERSION = '3.6'
+    tags: true
